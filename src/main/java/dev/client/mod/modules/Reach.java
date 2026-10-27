@@ -17,9 +17,9 @@ public class Reach extends Module {
 
     public Reach() {
         super("Reach", GLFW.GLFW_KEY_J, false);
-        settings.add(new Setting("Range", () -> String.format(java.util.Locale.ROOT, "%.2f", Config.reachRange),
-                () -> { Config.reachRange = Math.max(3.0, Config.reachRange - 0.25); Config.save(); },
-                () -> { Config.reachRange = Math.min(6.0, Config.reachRange + 0.25); Config.save(); }));
+        settings.add(new Setting("Range", () -> String.format(java.util.Locale.ROOT, "%.1f", Config.reachRange),
+                () -> Config.setReach(Config.reachRange - 0.1),
+                () -> Config.setReach(Config.reachRange + 0.1)));
     }
 
     private void apply(double value) {

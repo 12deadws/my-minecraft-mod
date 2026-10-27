@@ -21,10 +21,14 @@ public class Config {
     /** TriggerBot: random reaction delay in ticks (20 ticks = 1 second) between a target appearing and the attack. */
     public static int triggerMinDelay = 0;
     public static int triggerMaxDelay = 0;
-    /** Reach: how far (in blocks) the client tries to hit while Reach is on. */
+    /** Reach: how far (in blocks) the client tries to hit while Reach is on. Adjustable in 0.1 steps. */
+    public static final double REACH_MIN = 3.0;
+    public static final double REACH_MAX = 10.0;
     public static double reachRange = 4.5;
     /** AutoPot: throws a heal potion at or below this many hearts. */
     public static double autoPotHearts = 3.0;
+    /** AutoPot: total time (ticks, 20 = 1 second) of the look-down, throw, look-back motion. 8 = 0.4s. */
+    public static int autoPotLookTicks = 8;
 
     /** Players (lowercase names) the macros/triggerbot will never auto-attack. */
     public static final Set<String> friends = new HashSet<>();
@@ -41,8 +45,9 @@ public class Config {
             triggerHitChance = clamp(parseInt(p, "triggerbot.hitChance", 100));
             triggerMinDelay = Math.max(0, parseInt(p, "triggerbot.minDelayTicks", 0));
             triggerMaxDelay = Math.max(triggerMinDelay, parseInt(p, "triggerbot.maxDelayTicks", 0));
-            reachRange = Math.max(3.0, Math.min(6.0, parseDouble(p, "reach.range", 4.5)));
+            reachRange = clampReach(parseDouble(p, "reach.range", 4.5));
             autoPotHearts = Math.max(0.5, Math.min(10.0, parseDouble(p, "autopot.hearts", 3.0)));
+            autoPotLookTicks = Math.max(4, Math.min(20, parseInt(p, "autopot.lookTicks", 8)));
             friends.clear();
             for (String n : p.getProperty("friends", "").split(",")) {
                 n = n.trim();
@@ -60,6 +65,7 @@ public class Config {
         p.setProperty("triggerbot.maxDelayTicks", Integer.toString(triggerMaxDelay));
         p.setProperty("reach.range", Double.toString(reachRange));
         p.setProperty("autopot.hearts", Double.toString(autoPotHearts));
+        p.setProperty("autopot.lookTicks", Integer.toString(autoPotLookTicks));
         p.setProperty("friends", String.join(",", friends));
         try (Writer w = Files.newBufferedWriter(FILE)) {
             p.store(w, "Caelestial Client settings");
@@ -77,6 +83,14 @@ public class Config {
         try { return Double.parseDouble(p.getProperty(key, Double.toString(def)).trim()); }
         catch (NumberFormatException e) { return def; }
     }
+
+    /** Clamps to [REACH_MIN, REACH_MAX] and rounds to 1 decimal so 0.1 steps don't drift (4.699999...). */
+    public static double clampReach(double v) {
+        v = Math.max(REACH_MIN, Math.min(REACH_MAX, v));
+        return Math.round(v * 10.0) / 10.0;
+    }
+
+    public static void setReach(double v) { reachRange = clampReach(v); save(); }
 
     public static int clamp(int v) { return Math.max(0, Math.min(100, v)); }
 }

@@ -1,6 +1,7 @@
 package dev.client.mod;
 
 import dev.client.mod.modules.AutoCrit;
+import dev.client.mod.modules.AutoPot;
 import dev.client.mod.modules.Reach;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -47,8 +48,15 @@ public class Util {
         p.swing(InteractionHand.MAIN_HAND);
     }
 
+    /** True while AutoPot is mid-throw; other modules must not touch the hotbar or attack then. */
+    public static boolean potBusy() {
+        AutoPot ap = ModuleManager.get(AutoPot.class);
+        return ap != null && ap.busy();
+    }
+
     /** Selects the first hotbar slot whose stack matches. */
     public static boolean select(Predicate<ItemStack> f) {
+        if (potBusy()) return false;
         LocalPlayer p = mc.player;
         for (int i = 0; i < 9; i++) {
             if (f.test(p.getInventory().getItem(i))) {
@@ -59,7 +67,9 @@ public class Util {
         return false;
     }
 
+    /** True only at a full attack charge (and never while AutoPot is mid-throw). */
     public static boolean ready() {
-        return mc.player.getAttackStrengthScale(0f) >= 0.95f;
+        if (potBusy()) return false;
+        return mc.player.getAttackStrengthScale(0f) >= 1.0f;
     }
 }
