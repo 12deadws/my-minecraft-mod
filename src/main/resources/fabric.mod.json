@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "caelestial",
+  "version": "${version}",
+  "name": "Caelestial Client",
+  "description": "Client-side combat macros (triggerbot, stun slam, auto crit, lunge, reach, fly, auto pot) with a config file. For servers that allow them.",
+  "authors": ["YourName"],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/caelestial",
+    "sources": "https://github.com/YourName/caelestial",
+    "issues": "https://github.com/YourName/caelestial/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/caelestial/icon.png",
+  "environment": "client",
+  "entrypoints": { "client": ["dev.client.mod.MyClient"] },
+  "depends": {
+    "fabricloader": ">=0.17.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
