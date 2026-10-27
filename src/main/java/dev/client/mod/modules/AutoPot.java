@@ -38,10 +38,15 @@ public class AutoPot extends Module {
         int prev = p.getInventory().getSelectedSlot();
         if (!Util.select(AutoPot::isHealPot)) return;
 
+        // useItem() sends the player's CURRENT rotation, so actually point straight down
+        // (not just a rotation packet), throw, then put the view back.
         float yaw = p.getYRot();
+        float oldPitch = p.getXRot();
+        p.setXRot(90f);
         p.connection.send(new ServerboundMovePlayerPacket.Rot(yaw, 90f, p.onGround(), p.horizontalCollision));
         mc.gameMode.useItem(p, InteractionHand.MAIN_HAND);
-        p.connection.send(new ServerboundMovePlayerPacket.Rot(yaw, p.getXRot(), p.onGround(), p.horizontalCollision));
+        p.setXRot(oldPitch);
+        p.connection.send(new ServerboundMovePlayerPacket.Rot(yaw, oldPitch, p.onGround(), p.horizontalCollision));
         p.getInventory().setSelectedSlot(prev);
         cooldown = 10;
     }
