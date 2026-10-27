@@ -4,12 +4,14 @@
 - Set mod_version and archives_base_name in gradle.properties (already included in this project).
 - processResources in build.gradle fills "${version}" in fabric.mod.json.
 - `./gradlew build` -> upload the file in build/libs/ that does NOT end in -sources or -dev
-  (e.g. mymod-1.0.0.jar).
+  (e.g. caelestial-1.0.0.jar).
 - Test it on a clean install (Fabric + Fabric API + only this jar) before uploading.
 
 ## 2. Change the placeholders
-- Mod id "mymod" (fabric.mod.json, assets/mymod/, MyClient package) -> your unique id, lowercase.
-  Search for "mymod" and "YourName" across the project.
+- Mod id is now "caelestial" and the name is "Caelestial Client". If you want a different id, change it in
+  fabric.mod.json, the assets/caelestial/ folder name, archives_base_name in gradle.properties,
+  and the config file name in Config.java.
+- Search the project for "YourName" and put your real name / GitHub username (fabric.mod.json, LICENSE).
 - Replace icon.png (512x512) if you want your own.
 - Pick the license you actually want; MIT is a placeholder. Match it in fabric.mod.json and LICENSE.
 
