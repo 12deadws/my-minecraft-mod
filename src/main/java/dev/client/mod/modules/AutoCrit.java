@@ -1,6 +1,7 @@
 package dev.client.mod.modules;
 
 import dev.client.mod.*;
+import dev.client.mod.Module;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import org.lwjgl.glfw.GLFW;

@@ -1,6 +1,7 @@
 package dev.client.mod.modules;
 
 import dev.client.mod.*;
+import dev.client.mod.Module;
 import org.lwjgl.glfw.GLFW;
 
 /** Raises how far THIS client will try to hit (Config.reachRange). The server still has its own distance check. */

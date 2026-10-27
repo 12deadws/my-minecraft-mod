@@ -1,6 +1,7 @@
 package dev.client.mod.modules;
 
 import dev.client.mod.*;
+import dev.client.mod.Module;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Abilities;
 import org.lwjgl.glfw.GLFW;

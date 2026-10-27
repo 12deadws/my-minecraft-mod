@@ -1,6 +1,7 @@
 package dev.client.mod.modules;
 
 import dev.client.mod.*;
+import dev.client.mod.Module;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
