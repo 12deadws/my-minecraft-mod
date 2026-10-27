@@ -29,6 +29,8 @@ public class Config {
     public static double autoPotHearts = 3.0;
     /** AutoPot: total time (ticks, 20 = 1 second) of the look-down, throw, look-back motion. 8 = 0.4s. */
     public static int autoPotLookTicks = 8;
+    /** AutoPot: hotbar slot (1-9) that gets a pot from the inventory when the hotbar has no free slot. */
+    public static int autoPotRefillSlot = 9;
 
     /** Players (lowercase names) the macros/triggerbot will never auto-attack. */
     public static final Set<String> friends = new HashSet<>();
@@ -48,6 +50,7 @@ public class Config {
             reachRange = clampReach(parseDouble(p, "reach.range", 4.5));
             autoPotHearts = Math.max(0.5, Math.min(10.0, parseDouble(p, "autopot.hearts", 3.0)));
             autoPotLookTicks = Math.max(4, Math.min(20, parseInt(p, "autopot.lookTicks", 8)));
+            autoPotRefillSlot = Math.max(1, Math.min(9, parseInt(p, "autopot.refillSlot", 9)));
             friends.clear();
             for (String n : p.getProperty("friends", "").split(",")) {
                 n = n.trim();
@@ -66,6 +69,7 @@ public class Config {
         p.setProperty("reach.range", Double.toString(reachRange));
         p.setProperty("autopot.hearts", Double.toString(autoPotHearts));
         p.setProperty("autopot.lookTicks", Integer.toString(autoPotLookTicks));
+        p.setProperty("autopot.refillSlot", Integer.toString(autoPotRefillSlot));
         p.setProperty("friends", String.join(",", friends));
         try (Writer w = Files.newBufferedWriter(FILE)) {
             p.store(w, "Caelestial Client settings");

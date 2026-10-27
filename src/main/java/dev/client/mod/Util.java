@@ -1,6 +1,5 @@
 package dev.client.mod;
 
-import dev.client.mod.modules.AutoCrit;
 import dev.client.mod.modules.AutoPot;
 import dev.client.mod.modules.Reach;
 import net.minecraft.client.Minecraft;
@@ -42,8 +41,6 @@ public class Util {
 
     public static void attack(Entity e) {
         LocalPlayer p = mc.player;
-        AutoCrit crit = ModuleManager.get(AutoCrit.class);
-        if (crit != null && crit.enabled) crit.sendCritPackets(p);
         mc.gameMode.attack(p, e);
         p.swing(InteractionHand.MAIN_HAND);
     }
