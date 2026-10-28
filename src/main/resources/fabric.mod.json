@@ -3,8 +3,11 @@
   "id": "cael3stis",
   "version": "${version}",
   "name": "Cael3stis Client",
-  "description": "Client-side configurable PvP utilities (early development build)",
+  "description": "Client-side Fabric PvP utilities, overlays and a heavenly ClickGUI.",
+  "authors": ["Cael3stis community"],
   "environment": "client",
-  "entrypoints": { "client": ["dev.cael3stis.client.Cael3stisClient"] },
-  "depends": { "fabricloader": ">=0.18.0", "minecraft": "1.21.11", "java": ">=21", "fabric-api": "*" }
+  "entrypoints": {"client": ["dev.cael3stis.client.Cael3stisClient"]},
+  "depends": {"fabricloader": ">=0.18.4", "minecraft": "1.21.11", "java": ">=21", "fabric-api": "*"},
+  "suggests": {"sodium": "*"},
+  "license": "MIT"
 }
