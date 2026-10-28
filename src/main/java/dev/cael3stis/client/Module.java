@@ -3,7 +3,6 @@ package dev.cael3stis.client;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class Module {
