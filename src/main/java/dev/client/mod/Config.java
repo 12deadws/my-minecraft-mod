@@ -1,14 +1,17 @@
 package dev.client.mod;
 
 import net.fabricmc.loader.api.FabricLoader;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -32,6 +35,18 @@ public class Config {
     /** AutoPot: hotbar slot (1-9) that gets a pot from the inventory when the hotbar has no free slot. */
     public static int autoPotRefillSlot = 9;
 
+    /** Client-wide keys. Rebindable in the menu (-1 = unbound; the menu key can't be unbound). */
+    public static int menuKey = GLFW.GLFW_KEY_RIGHT_SHIFT;
+    public static int chanceDownKey = GLFW.GLFW_KEY_LEFT_BRACKET;
+    public static int chanceUpKey = GLFW.GLFW_KEY_RIGHT_BRACKET;
+
+    /** Module keybinds the user changed, keyed by bindId(module name). Modules not listed keep their default key. */
+    public static final Map<String, Integer> binds = new HashMap<>();
+
+    public static String bindId(String moduleName) { return moduleName.replace(' ', '_'); }
+
+    private static boolean validKey(int k) { return k == -1 || (k >= GLFW.GLFW_KEY_SPACE && k <= GLFW.GLFW_KEY_LAST); }
+
     /** Players (lowercase names) the macros/triggerbot will never auto-attack. */
     public static final Set<String> friends = new HashSet<>();
 
@@ -51,6 +66,18 @@ public class Config {
             autoPotHearts = Math.max(0.5, Math.min(10.0, parseDouble(p, "autopot.hearts", 3.0)));
             autoPotLookTicks = Math.max(4, Math.min(20, parseInt(p, "autopot.lookTicks", 8)));
             autoPotRefillSlot = Math.max(1, Math.min(9, parseInt(p, "autopot.refillSlot", 9)));
+            int menu = parseInt(p, "key.menu", GLFW.GLFW_KEY_RIGHT_SHIFT);
+            menuKey = menu >= GLFW.GLFW_KEY_SPACE && menu <= GLFW.GLFW_KEY_LAST ? menu : GLFW.GLFW_KEY_RIGHT_SHIFT;
+            int down = parseInt(p, "key.hitChanceDown", GLFW.GLFW_KEY_LEFT_BRACKET);
+            int up = parseInt(p, "key.hitChanceUp", GLFW.GLFW_KEY_RIGHT_BRACKET);
+            chanceDownKey = validKey(down) ? down : GLFW.GLFW_KEY_LEFT_BRACKET;
+            chanceUpKey = validKey(up) ? up : GLFW.GLFW_KEY_RIGHT_BRACKET;
+            binds.clear();
+            for (String name : p.stringPropertyNames()) {
+                if (!name.startsWith("bind.")) continue;
+                int k = parseInt(p, name, -2);
+                if (validKey(k)) binds.put(name.substring(5), k);
+            }
             friends.clear();
             for (String n : p.getProperty("friends", "").split(",")) {
                 n = n.trim();
@@ -70,6 +97,10 @@ public class Config {
         p.setProperty("autopot.hearts", Double.toString(autoPotHearts));
         p.setProperty("autopot.lookTicks", Integer.toString(autoPotLookTicks));
         p.setProperty("autopot.refillSlot", Integer.toString(autoPotRefillSlot));
+        p.setProperty("key.menu", Integer.toString(menuKey));
+        p.setProperty("key.hitChanceDown", Integer.toString(chanceDownKey));
+        p.setProperty("key.hitChanceUp", Integer.toString(chanceUpKey));
+        for (Map.Entry<String, Integer> e : binds.entrySet()) p.setProperty("bind." + e.getKey(), Integer.toString(e.getValue()));
         p.setProperty("friends", String.join(",", friends));
         try (Writer w = Files.newBufferedWriter(FILE)) {
             p.store(w, "Caelestial Client settings");

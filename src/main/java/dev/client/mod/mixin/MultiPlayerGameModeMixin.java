@@ -2,6 +2,7 @@ package dev.client.mod.mixin;
 
 import dev.client.mod.ModuleManager;
 import dev.client.mod.modules.AutoCrit;
+import dev.client.mod.modules.visuals.HitParticles;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
@@ -25,5 +26,8 @@ public class MultiPlayerGameModeMixin {
     private void caelestial$afterAttack(Player player, Entity target, CallbackInfo ci) {
         AutoCrit crit = ModuleManager.get(AutoCrit.class);
         if (crit != null && crit.enabled && player instanceof LocalPlayer lp) crit.afterAttack(lp);
+
+        HitParticles hit = ModuleManager.get(HitParticles.class);
+        if (hit != null && hit.enabled && player instanceof LocalPlayer) hit.onAttack(target);
     }
 }

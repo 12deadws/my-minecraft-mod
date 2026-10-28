@@ -3,6 +3,7 @@
   "package": "dev.client.mod.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "EntityAccessor",
     "MultiPlayerGameModeMixin"
   ],
   "injectors": {
