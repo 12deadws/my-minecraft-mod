@@ -1,13 +1,22 @@
 {
   "schemaVersion": 1,
-  "id": "cael3stis",
+  "id": "caelestis_client",
   "version": "${version}",
-  "name": "Cael3stis Client",
-  "description": "Client-side Fabric PvP utilities, overlays and a heavenly ClickGUI.",
-  "authors": ["Cael3stis community"],
+  "name": "Caelestis Client",
+  "description": "Configurable PvP utility client for permitted private-server testing. Combat, Player, Crystal PvP and Render modules with a ivory-and-gold heavenly ClickGUI and celestial title panorama.",
+  "authors": ["Caelestis"],
+  "license": "All-Rights-Reserved",
   "environment": "client",
-  "entrypoints": {"client": ["dev.cael3stis.client.Cael3stisClient"]},
-  "depends": {"fabricloader": ">=0.18.4", "minecraft": "1.21.11", "java": ">=21", "fabric-api": "*"},
-  "suggests": {"sodium": "*"},
-  "license": "MIT"
+  "entrypoints": {
+    "client": ["com.caelestis.client.CaelestisClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "sodium": "*"
+  }
 }
