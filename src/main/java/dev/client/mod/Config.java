@@ -1,7 +1,6 @@
 package dev.client.mod;
 
 import net.fabricmc.loader.api.FabricLoader;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -15,43 +14,33 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-/** Settings file at .minecraft/config/caelestial.properties (edit by hand, or use the in-game hit chance keys). */
+/** Settings file at .minecraft/config/caelestial.properties (the menu edits it for you). */
 public class Config {
     private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("caelestial.properties");
 
-    /** TriggerBot: percent chance (0-100) that it attacks on each attempt. */
     public static int triggerHitChance = 100;
-    /** TriggerBot: random reaction delay in ticks (20 ticks = 1 second) between a target appearing and the attack. */
     public static int triggerMinDelay = 0;
     public static int triggerMaxDelay = 0;
-    /** Reach: how far (in blocks) the client tries to hit while Reach is on. Adjustable in 0.1 steps. */
-    public static final double REACH_MIN = 3.0;
-    public static final double REACH_MAX = 10.0;
     public static double reachRange = 4.5;
-    /** AutoPot: throws a heal potion at or below this many hearts. */
     public static double autoPotHearts = 3.0;
-    /** AutoPot: total time (ticks, 20 = 1 second) of the look-down, throw, look-back motion. 8 = 0.4s. */
-    public static int autoPotLookTicks = 8;
-    /** AutoPot: hotbar slot (1-9) that gets a pot from the inventory when the hotbar has no free slot. */
-    public static int autoPotRefillSlot = 9;
 
-    /** Client-wide keys. Rebindable in the menu (-1 = unbound; the menu key can't be unbound). */
-    public static int menuKey = GLFW.GLFW_KEY_RIGHT_SHIFT;
-    public static int chanceDownKey = GLFW.GLFW_KEY_LEFT_BRACKET;
-    public static int chanceUpKey = GLFW.GLFW_KEY_RIGHT_BRACKET;
-
-    /** Module keybinds the user changed, keyed by bindId(module name). Modules not listed keep their default key. */
-    public static final Map<String, Integer> binds = new HashMap<>();
-
-    public static String bindId(String moduleName) { return moduleName.replace(' ', '_'); }
-
-    private static boolean validKey(int k) { return k == -1 || (k >= GLFW.GLFW_KEY_SPACE && k <= GLFW.GLFW_KEY_LAST); }
+    public static boolean espChests = true;
+    public static boolean espShulkers = true;
+    public static boolean espSpawners = true;
+    public static int espRange = 64;
 
     /** Players (lowercase names) the macros/triggerbot will never auto-attack. */
     public static final Set<String> friends = new HashSet<>();
 
+    private static final Map<String, Integer> savedKeys = new HashMap<>();
+
     public static boolean isFriend(String name) {
         return friends.contains(name.toLowerCase(Locale.ROOT));
+    }
+
+    /** Every module starts with no keybind (-1) unless one was saved. */
+    public static void applyKeys() {
+        for (Module m : ModuleManager.modules) m.key = savedKeys.getOrDefault(m.name, -1);
     }
 
     public static void load() {
@@ -62,26 +51,23 @@ public class Config {
             triggerHitChance = clamp(parseInt(p, "triggerbot.hitChance", 100));
             triggerMinDelay = Math.max(0, parseInt(p, "triggerbot.minDelayTicks", 0));
             triggerMaxDelay = Math.max(triggerMinDelay, parseInt(p, "triggerbot.maxDelayTicks", 0));
-            reachRange = clampReach(parseDouble(p, "reach.range", 4.5));
+            reachRange = Math.max(3.0, Math.min(6.0, parseDouble(p, "reach.range", 4.5)));
             autoPotHearts = Math.max(0.5, Math.min(10.0, parseDouble(p, "autopot.hearts", 3.0)));
-            autoPotLookTicks = Math.max(4, Math.min(20, parseInt(p, "autopot.lookTicks", 8)));
-            autoPotRefillSlot = Math.max(1, Math.min(9, parseInt(p, "autopot.refillSlot", 9)));
-            int menu = parseInt(p, "key.menu", GLFW.GLFW_KEY_RIGHT_SHIFT);
-            menuKey = menu >= GLFW.GLFW_KEY_SPACE && menu <= GLFW.GLFW_KEY_LAST ? menu : GLFW.GLFW_KEY_RIGHT_SHIFT;
-            int down = parseInt(p, "key.hitChanceDown", GLFW.GLFW_KEY_LEFT_BRACKET);
-            int up = parseInt(p, "key.hitChanceUp", GLFW.GLFW_KEY_RIGHT_BRACKET);
-            chanceDownKey = validKey(down) ? down : GLFW.GLFW_KEY_LEFT_BRACKET;
-            chanceUpKey = validKey(up) ? up : GLFW.GLFW_KEY_RIGHT_BRACKET;
-            binds.clear();
-            for (String name : p.stringPropertyNames()) {
-                if (!name.startsWith("bind.")) continue;
-                int k = parseInt(p, name, -2);
-                if (validKey(k)) binds.put(name.substring(5), k);
-            }
+            espChests = Boolean.parseBoolean(p.getProperty("esp.chests", "true"));
+            espShulkers = Boolean.parseBoolean(p.getProperty("esp.shulkers", "true"));
+            espSpawners = Boolean.parseBoolean(p.getProperty("esp.spawners", "true"));
+            espRange = Math.max(16, Math.min(128, parseInt(p, "esp.range", 64)));
             friends.clear();
             for (String n : p.getProperty("friends", "").split(",")) {
                 n = n.trim();
                 if (!n.isEmpty()) friends.add(n.toLowerCase(Locale.ROOT));
+            }
+            savedKeys.clear();
+            for (String name : p.stringPropertyNames()) {
+                if (name.startsWith("key.")) {
+                    try { savedKeys.put(name.substring(4), Integer.parseInt(p.getProperty(name).trim())); }
+                    catch (NumberFormatException ignored) {}
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -95,13 +81,16 @@ public class Config {
         p.setProperty("triggerbot.maxDelayTicks", Integer.toString(triggerMaxDelay));
         p.setProperty("reach.range", Double.toString(reachRange));
         p.setProperty("autopot.hearts", Double.toString(autoPotHearts));
-        p.setProperty("autopot.lookTicks", Integer.toString(autoPotLookTicks));
-        p.setProperty("autopot.refillSlot", Integer.toString(autoPotRefillSlot));
-        p.setProperty("key.menu", Integer.toString(menuKey));
-        p.setProperty("key.hitChanceDown", Integer.toString(chanceDownKey));
-        p.setProperty("key.hitChanceUp", Integer.toString(chanceUpKey));
-        for (Map.Entry<String, Integer> e : binds.entrySet()) p.setProperty("bind." + e.getKey(), Integer.toString(e.getValue()));
+        p.setProperty("esp.chests", Boolean.toString(espChests));
+        p.setProperty("esp.shulkers", Boolean.toString(espShulkers));
+        p.setProperty("esp.spawners", Boolean.toString(espSpawners));
+        p.setProperty("esp.range", Integer.toString(espRange));
         p.setProperty("friends", String.join(",", friends));
+        for (Map.Entry<String, Integer> e : savedKeys.entrySet()) p.setProperty("key." + e.getKey(), Integer.toString(e.getValue()));
+        for (Module m : ModuleManager.modules) {
+            savedKeys.put(m.name, m.key);
+            p.setProperty("key." + m.name, Integer.toString(m.key));
+        }
         try (Writer w = Files.newBufferedWriter(FILE)) {
             p.store(w, "Caelestial Client settings");
         } catch (IOException e) {
@@ -118,14 +107,6 @@ public class Config {
         try { return Double.parseDouble(p.getProperty(key, Double.toString(def)).trim()); }
         catch (NumberFormatException e) { return def; }
     }
-
-    /** Clamps to [REACH_MIN, REACH_MAX] and rounds to 1 decimal so 0.1 steps don't drift (4.699999...). */
-    public static double clampReach(double v) {
-        v = Math.max(REACH_MIN, Math.min(REACH_MAX, v));
-        return Math.round(v * 10.0) / 10.0;
-    }
-
-    public static void setReach(double v) { reachRange = clampReach(v); save(); }
 
     public static int clamp(int v) { return Math.max(0, Math.min(100, v)); }
 }

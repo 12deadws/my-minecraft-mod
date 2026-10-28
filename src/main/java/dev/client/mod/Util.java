@@ -1,9 +1,12 @@
 package dev.client.mod;
 
-import dev.client.mod.modules.AutoPot;
+import dev.client.mod.modules.AutoCrit;
 import dev.client.mod.modules.Reach;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,21 +42,25 @@ public class Util {
         return hit == null ? null : hit.getEntity();
     }
 
+    /** Attack: spears are used with a real left-click (they jab/lunge); everything else is a normal attack packet. */
     public static void attack(Entity e) {
         LocalPlayer p = mc.player;
+        if (p.getMainHandItem().is(ItemTags.SPEARS)) {
+            clickAttack();
+            return;
+        }
+        // AutoCrit's packets are sent from the attack hook in MyClient, so manual clicks crit too.
         mc.gameMode.attack(p, e);
         p.swing(InteractionHand.MAIN_HAND);
     }
 
-    /** True while AutoPot is mid-throw; other modules must not touch the hotbar or attack then. */
-    public static boolean potBusy() {
-        AutoPot ap = ModuleManager.get(AutoPot.class);
-        return ap != null && ap.busy();
+    /** Simulates pressing the attack (left click) key once. Handled by the game on its next input pass. */
+    public static void clickAttack() {
+        KeyMapping.click(InputConstants.getKey(mc.options.keyAttack.saveString()));
     }
 
     /** Selects the first hotbar slot whose stack matches. */
     public static boolean select(Predicate<ItemStack> f) {
-        if (potBusy()) return false;
         LocalPlayer p = mc.player;
         for (int i = 0; i < 9; i++) {
             if (f.test(p.getInventory().getItem(i))) {
@@ -64,9 +71,7 @@ public class Util {
         return false;
     }
 
-    /** True only at a full attack charge (and never while AutoPot is mid-throw). */
     public static boolean ready() {
-        if (potBusy()) return false;
-        return mc.player.getAttackStrengthScale(0f) >= 1.0f;
+        return mc.player.getAttackStrengthScale(0f) >= 0.95f;
     }
 }

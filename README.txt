@@ -12,9 +12,10 @@ BUILD
 INSTALL
 Put the jar in .minecraft/mods together with Fabric API (Fabric Loader required).
 
-KEYS (in game, no screen open)
-R TriggerBot | G StunSlam (one-shot) | C AutoCrit | H Lunge | J Reach | F Fly | P AutoPot
-[ and ] : TriggerBot hit chance -5% / +5%
+KEYS
+Right Shift opens/closes the menu. Every module starts with Keybind: NONE; use the menu toggles,
+or open a module's dropdown, click "Keybind", press a key (Esc clears, Right Shift cancels).
+Binding a key that another module uses unbinds the other one. Binds are saved to the config file.
 
 CONFIG (config/caelestial.properties, created on first launch)
 triggerbot.hitChance      0-100, chance to attack per attempt
@@ -22,6 +23,9 @@ triggerbot.minDelayTicks  random reaction delay range before attacking (20 ticks
 triggerbot.maxDelayTicks
 reach.range               3.0-6.0, used while Reach is on
 autopot.hearts            heal-pot threshold in hearts
+esp.chests / esp.shulkers / esp.spawners   true/false
+esp.range                 16-128 blocks
+key.<Module>              saved keybinds (-1 = none)
 friends                   comma-separated player names never auto-attacked (e.g. friends=Steve,Alex)
 Restart the game after hand-editing the file.
 

@@ -6,7 +6,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
 import org.lwjgl.glfw.GLFW;
 
-/** While enabled: swaps to a spear and jabs whatever you're aiming at on cooldown (spear lunge). */
+/** While enabled: swaps to a spear and left-clicks (jab/lunge) when a target is in front of you. */
 public class LungeMacro extends Module {
     public LungeMacro() {
         super("Lunge", GLFW.GLFW_KEY_H, false);
@@ -16,7 +16,7 @@ public class LungeMacro extends Module {
     @Override public void onTick() {
         if (!Util.select(s -> s.is(ItemTags.SPEARS))) return;
         if (!Util.ready()) return;
-        Entity t = Util.target(Util.reach() + 1.0);
-        if (t != null) Util.attack(t);
+        Entity t = Util.target(Util.reach() + 3.0);
+        if (t != null) Util.clickAttack();
     }
 }

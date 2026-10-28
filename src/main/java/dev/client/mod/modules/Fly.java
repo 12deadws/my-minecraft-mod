@@ -8,7 +8,7 @@ import org.lwjgl.glfw.GLFW;
 
 /** Creative-style flight. Server must have allow-flight=true or it will kick you. */
 public class Fly extends Module {
-    public Fly() { super("Fly", -1, false);   // no default key: toggle from the menu or bind one there }
+    public Fly() { super("Fly", GLFW.GLFW_KEY_F, false); }
 
     @Override public void onTick() {
         Abilities a = Minecraft.getInstance().player.getAbilities();
